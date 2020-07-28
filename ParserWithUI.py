@@ -30,21 +30,16 @@ while True:
             for r in pages:
                 html = BS(r.content, 'html.parser')
                 for i in html.select(".b-post"):
-                    text = list(map(str, str(i.select(".b-post__link")).split('>')))
-                    texts = list(map(str, text[1].split('<')))
-                    op = list(map(str, str(i).split('<div class="b-post__txt "> ')))
-                    ops = list(map(str, op[1].split('</div>')))
-                    mon = list(map(str, str(i).split("&nbsp;")))
-                    mons = list(map(str, mon[0].split('>')))
-                    url = list(map(str, str(i).split('class="b-post__link" href="')))
-                    urls = list(map(str, url[1].split('"')))
-                    ans += texts[0] + "   "
+                    name = list(map(str, list(map(str, str(i.select(".b-post__link")).split('>')))[1].split('<')))[0]
+                    title = list(map(str, list(map(str, str(i).split('<div class="b-post__txt "> ')))[1].split('</div>')))[0]
+                    mon = list(map(str, list(map(str, str(i).split('&nbsp;')))[0].split('>')))[-1]
+                    url = "fl.ru" + list(map(str, list(map(str, str(i).split('class="b-post__link" href="')))[1].split('"')))[0]
                     if mon[1][0] == '₽':
-                        ans += mons[-1] + mon[1][0]
+                        mon += "₽"
                     else:
-                        ans += mons[-1] + "$"
-                    ans += "   " + "fl.ru" + urls[0] + "   "
-                    ans += "\n" + ops[0] + "\n\n"
+                        mon += "$"
+                    ans += name + "   " + mon + "   " + url + "   " + "\n" + title + "\n\n========================================================================================================================\n"
+
                     for l in range(len(list(map(str, values[0].split("&"))))):
                         if ' ' +words[l]+ ' ' in ans:
                             print(ans)
