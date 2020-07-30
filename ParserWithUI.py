@@ -2,13 +2,13 @@ import PySimpleGUI as sg
 from bs4 import BeautifulSoup as BS
 import requests
 layout = [
-    [sg.Text('Найти по ключевым словам(через &)'), sg.InputText()],
+    [sg.Text('Найти по ключевым словам(через &)'), sg.InputText(),sg.Text('Бюджет от'), sg.InputText(size=(7,7)),sg.Text('руб. до'), sg.InputText(size=(7,7)),sg.Text('руб.')],
     [sg.Text('Kол-во заявок на одной странице'), sg.InputText(default_text="10",size=(3,7))],
     [sg.Output(size=(150, 20))],
 
     [sg.Button("Далее")]
 ]
-def fl(x):
+def fl(x,minb,maxb):
     for j in range(z):
         pages = []
         ans = ""
@@ -23,18 +23,27 @@ def fl(x):
                 url = "fl.ru" + \
                       list(map(str, list(map(str, str(i).split('class="b-post__link" href="')))[1].split('"')))[0]
                 if list(map(str, str(i).split('&nbsp;')))[1][0] == '₽':
+                    realmon=int(mon)
                     mon += "₽"
                 else:
-                    mon += "$"
+                    try:
+                        realmon = int(mon) * 73
+                        mon += "$"
+                    except:
+                        realmon = minb + 1
+
                 ans += name + "   " + mon + "   " + url + "   " + "\n" + title + "\n\n========================================================================================================================\n"
-                for l in range(len(list(map(str, values[0].split("&"))))):
-                    if ' ' + words[l] + ' ' in ans:
-                        print(ans)
+                if realmon >= minb and realmon <= maxb:
+                    for l in range(len(list(map(str, values[0].split("&"))))):
+                        if ' ' + words[l] + ' ' in ans:
+                            print(ans)
+                else:
+                    x = fl(x, minb, maxb)
                 ans = ""
                 break
             x += 1
     return(x)
-def fh(x1):
+def fh(x1,minb,maxb):
     for j in range(z):
         pages = []
         ans = ""
@@ -49,13 +58,20 @@ def fh(x1):
                 title = ""
                 try:
                     mon = list(map(str, list(map(str, str(i.select(".count")).split('count">')))[1].split('<')))[0]
+                    realmon=""
+                    for q in range(len(list(map(str, list(map(str, list(map(str, str(i.select(".count")).split('count">')))[1].split('<')))[0][:-6].split(' '))))):
+                        realmon+=list(map(str, list(map(str, list(map(str, str(i.select(".count")).split('count">')))[1].split('<')))[0][:-6].split(' ')))[q]
                 except:
                     mon = "Договорнаяя"
+                    realmon=minb+1
                 url = 'https://freelance.habr.com/' +list(map(str, list(map(str, str(i).split('href="')))[1].split('"')))[0]
                 ans += name + "   " + mon + "   " + url + "   " + "\n" + title + "\n\n========================================================================================================================\n"
-                for l in range(len(list(map(str, values[0].split("&"))))):
-                    if ' ' + words[l] + ' ' in ans:
-                        print(ans)
+                if int(realmon) >= minb and int(realmon) <= maxb:
+                    for l in range(len(list(map(str, values[0].split("&"))))):
+                        if ' ' + words[l] + ' ' in ans:
+                            print(ans)
+                else:
+                    x1 = fh(x1, minb, maxb)
                 ans = ""
                 break
             x1 += 1
@@ -74,7 +90,15 @@ while True:
         words=list(map(str, values[0].split("&")))
     else:
         words = [values[0]]
-    z=int(values[1])
+    if values[1] != '':
+        minb=int(values[1])
+    else:
+        minb=0
+    if values[2] != '':
+        maxb=int(values[2])
+    else:
+        maxb=99999999
+    z=int(values[3])
     if event == 'Далее':
         tf=1
         tf1+=1
@@ -83,9 +107,9 @@ while True:
 
     if tf == 1:
         if tf1 == 0:
-            x=fl(x)
+            x=fl(x,minb,maxb)
         if tf1 == 1:
-            x1=fh(x1)
-        tf=0
+            x1=fh(x1,minb,maxb)
 
+        tf=0
 
