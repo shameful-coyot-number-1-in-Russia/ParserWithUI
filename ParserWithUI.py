@@ -83,7 +83,7 @@ while True:
 
     if tf == 1:
         if tf1 == 0:
-            x1=fl(x)
+            x=fl(x)
         if tf1 == 1:
             x1=fh(x1)
         tf=0
